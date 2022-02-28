@@ -2,8 +2,9 @@
   "name": "dadsgame-backtoback",
   "version": "1.0.0",
   "description": "backtoback for dadsgame project",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,6 +25,7 @@
     "node": "16.14.0"
   },
   "dependencies": {
+    "@hapi/catbox-redis": "^6.0.2",
     "@hapi/hapi": "^20.2.1",
     "dotenv": "^16.0.0",
     "superagent": "^7.1.1"
