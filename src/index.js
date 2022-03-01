@@ -3,6 +3,7 @@ import req from 'superagent';
 import * as dotenv from "dotenv";
 import CatboxRedis from "@hapi/catbox-redis";
 import steamRoutes from "./routes/steamRoutes.js";
+import {handler} from "@hapi/hapi/lib/cors.js";
 
 
 dotenv.config();
@@ -45,13 +46,21 @@ server.route({
         return JSON.parse(steamInfo.res.text);
     }
 });
-// server.cache(getAllGamesCache);
+
 steamRoutes.forEach((route) => {
-    const handler = server.cache(route.handler);
-    return server.route(({...route, handler: async () => {
-            return await handler.get('games');
-        }}));
-    // return server.route(route);
+    if(typeof route.handler === 'object') {
+        const handler = server.cache(route.handler);
+        return server.route(({
+            ...route, handler: async (request, h) => {
+                return await handler.get({id: 'cache', request, h});
+            }
+        }));
+    }
+    return server.route(({
+        ...route, handler: async (request, h) => {
+            return await route.handler(request, h);
+        }
+    }));
 });
 
 const startServer= async () =>  {
