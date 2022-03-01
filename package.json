@@ -4,6 +4,7 @@
   "description": "backtoback for dadsgame project",
   "main": "src/index.js",
   "scripts": {
+    "dev": "nodemon src/index.js",
     "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,5 +31,8 @@
     "dotenv": "^16.0.0",
     "superagent": "^7.1.1"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
 }
