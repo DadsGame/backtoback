@@ -1,34 +1,17 @@
 import Hapi from '@hapi/hapi';
 import req from 'superagent';
 import * as dotenv from "dotenv";
-import CatboxRedis from "@hapi/catbox-redis";
 import steamRoutes from "./routes/steamRoutes.js";
-
+import igdbRoutes from "./routes/igdbRoutes.js";
 
 dotenv.config();
 
 const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || 'localhost';
-const REDIS_HOST = process.env.REDIS_HOST || '0.0.0.0';
-const REDIS_PORT = process.env.REDIS_PORT || 6379;
 
 const server = Hapi.server({
     port: PORT,
-    host: HOST,
-    cache: [
-        {
-            name: 'backtoback-cache',
-            provider: {
-                constructor: CatboxRedis,
-                options: {
-                    partition: 'cached_data',
-                    host: REDIS_HOST,
-                    port: REDIS_PORT,
-                    database: 0,
-                }
-            }
-        }
-    ]
+    host: HOST
 });
 
 
@@ -45,13 +28,28 @@ server.route({
         return JSON.parse(steamInfo.res.text);
     }
 });
-// server.cache(getAllGamesCache);
+
+
+// TODO: put routes in one array and loop instead of routing twice
 steamRoutes.forEach((route) => {
-    const handler = server.cache(route.handler);
-    return server.route(({...route, handler: async () => {
-            return await handler.get('games');
-        }}));
-    // return server.route(route);
+    server.route(route);
+    /*if(typeof route.handler === 'object') {
+        const handler = server.cache(route.handler);
+        return server.route(({
+            ...route, handler: async (request, h) => {
+                return await handler.get({id: 'cache', request, h});
+            }
+        }));
+    }
+    return server.route(({
+        ...route, handler: async (request, h) => {
+            return await route.handler(request, h);
+        }
+    }));*/
+});
+
+igdbRoutes.forEach((route) => {
+    server.route(route);
 });
 
 const startServer= async () =>  {
