@@ -10,26 +10,10 @@ dotenv.config();
 
 const PORT = process.env.PORT || 8000;
 const HOST = process.env.HOST || 'localhost';
-const REDIS_HOST = process.env.REDIS_HOST || '0.0.0.0';
-const REDIS_PORT = process.env.REDIS_PORT || 6379;
 
 const server = Hapi.server({
     port: PORT,
-    host: HOST,
-    cache: [
-        {
-            name: 'backtoback-cache',
-            provider: {
-                constructor: CatboxRedis,
-                options: {
-                    partition: 'cached_data',
-                    host: REDIS_HOST,
-                    port: REDIS_PORT,
-                    database: 0,
-                }
-            }
-        }
-    ]
+    host: HOST
 });
 
 
@@ -48,7 +32,8 @@ server.route({
 });
 
 steamRoutes.forEach((route) => {
-    if(typeof route.handler === 'object') {
+    server.route(route);
+    /*if(typeof route.handler === 'object') {
         const handler = server.cache(route.handler);
         return server.route(({
             ...route, handler: async (request, h) => {
@@ -60,7 +45,7 @@ steamRoutes.forEach((route) => {
         ...route, handler: async (request, h) => {
             return await route.handler(request, h);
         }
-    }));
+    }));*/
 });
 
 const startServer= async () =>  {
