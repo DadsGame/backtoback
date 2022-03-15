@@ -1,5 +1,5 @@
 import {
-    getAllGames,
+    getAllGames, getAppNews,
     getGameDetails,
     getOwnedGames,
     getProfileDetails,
@@ -31,6 +31,11 @@ const routes = [
         method: 'GET',
         path: '/api/profile/owned-games',
         handler: getOwnedGames,
+    },
+    {
+        method: 'GET',
+        path: '/api/games/news',
+        handler: getAppNews,
     },
 
 ];

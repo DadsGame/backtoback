@@ -1,5 +1,6 @@
 import req from "superagent";
 import {config} from "dotenv";
+import {getAllGames} from "../controllers/steamController.js";
 
 class SteamService {
 
@@ -36,8 +37,13 @@ class SteamService {
     }
 
     async getOwnedGames(profileId) {
-        const playerGames = await req.get(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001?key=${this.authorization}&steamid=${profileId}`);
-        return playerGames.body.response;
+        const request = await req.get(`http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001?key=${this.authorization}&steamid=${profileId}`);
+        return request.body.response;
+    }
+
+    async getAppNews(appid) {
+        const request = await req.get(`http://api.steampowered.com/ISteamNews/GetNewsForApp/v2?key=${this.authorization}&appid=${appid}`);
+        return request.body;
     }
 }
 

@@ -1,5 +1,6 @@
 import SteamService from "../services/steamService.js";
 import {config} from "../../config.js";
+import req from "superagent";
 
 
 const steamService = new SteamService();
@@ -36,9 +37,23 @@ export const getProfileDetails = async (request, h) => {
     return await steamService.getProfileDetails(profileid);
 }
 
+// TODO: add a sort by playtime and game name
 export const getOwnedGames = async (request, h) => {
     const profileid = request.query.profileid;
-    return await steamService.getOwnedGames(profileid);
+    const req = await steamService.getOwnedGames(profileid);
+    const playerGames = req.body.response;
+    const games = await getAllGames();
+    const formattedGames = playerGames.games.map((game) => {
+        const name = games.find(({appid}) => game.appid === appid)?.name ?? '';
+        return {name, ...game, playtime_forever_hour: game.playtime_forever / 60};
+    });
+    return {
+        game_count: playerGames.game_count,
+        games: formattedGames,
+    }
 }
 
-
+export const getAppNews = async (request, h) => {
+    const appId = request.query.appid;
+    return await steamService.getAppNews(appId);
+}
