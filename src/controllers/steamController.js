@@ -40,8 +40,7 @@ export const getProfileDetails = async (request, h) => {
 // TODO: add a sort by playtime and game name
 export const getOwnedGames = async (request, h) => {
     const profileid = request.query.profileid;
-    const req = await steamService.getOwnedGames(profileid);
-    const playerGames = req.body.response;
+    const playerGames = await steamService.getOwnedGames(profileid);
     const games = await getAllGames();
     const formattedGames = playerGames.games.map((game) => {
         const name = games.find(({appid}) => game.appid === appid)?.name ?? '';

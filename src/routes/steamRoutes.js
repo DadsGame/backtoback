@@ -9,35 +9,34 @@ import {
 const routes = [
     {
         method: 'GET',
-        path: '/api/games',
+        path: 'games',
         handler: getAllGames,
     },
     {
         method: 'GET',
-        path: '/api/g/games',
+        path: 'g/games',
         handler: searchGlobalGames,
     },
     {
         method: 'GET',
-        path: '/api/games/details',
+        path: 'games/details',
         handler: getGameDetails,
     },
     {
         method: 'GET',
-        path: '/api/profile',
+        path: 'profile',
         handler: getProfileDetails,
     },
     {
         method: 'GET',
-        path: '/api/profile/owned-games',
+        path: 'profile/owned-games',
         handler: getOwnedGames,
     },
     {
         method: 'GET',
-        path: '/api/games/news',
+        path: 'games/news',
         handler: getAppNews,
-    },
-
-];
+    }
+].map((route) => ({...route, path: `/api/steam/${route.path}`}));;
 
 export default routes;
