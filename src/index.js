@@ -1,10 +1,8 @@
 import Hapi from '@hapi/hapi';
 import req from 'superagent';
 import * as dotenv from "dotenv";
-import CatboxRedis from "@hapi/catbox-redis";
 import steamRoutes from "./routes/steamRoutes.js";
-import {handler} from "@hapi/hapi/lib/cors.js";
-
+import igdbRoutes from "./routes/igdbRoutes.js";
 
 dotenv.config();
 
@@ -31,6 +29,8 @@ server.route({
     }
 });
 
+
+// TODO: put routes in one array and loop instead of routing twice
 steamRoutes.forEach((route) => {
     server.route(route);
     /*if(typeof route.handler === 'object') {
@@ -46,6 +46,10 @@ steamRoutes.forEach((route) => {
             return await route.handler(request, h);
         }
     }));*/
+});
+
+igdbRoutes.forEach((route) => {
+    server.route(route);
 });
 
 const startServer= async () =>  {
