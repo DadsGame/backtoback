@@ -1,5 +1,5 @@
 import SteamService from "../services/steamService.js";
-import {config} from "../../config.js";
+import {conf} from "../../conf.js";
 import req from "superagent";
 
 
@@ -8,7 +8,8 @@ const ONE_HOUR = 60 * 60;
 const ONE_DAY = ONE_HOUR * 24;
 
 export const getAllGames = async (request, h) => {
-    const redisClient = config.redisClient();
+    // TODO: put this in a lib function I guess (redis cache)
+    const redisClient = conf.redisClient();
     await redisClient.connect();
     const cache = await redisClient.get('allGames');
     if(cache) {
