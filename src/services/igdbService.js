@@ -88,7 +88,6 @@ class IgdbService {
         const now = Date.now();
         const date = new Date(now);
         const ts = new Date(date.setMonth(date.getMonth() + timeWindow)).getTime();
-        console.log(new Date(now), new Date(ts));
         const res = await req
             .post('https://api.igdb.com/v4/games/')
             .set('Authorization', `Bearer ${this.credentials.authorization}`)
@@ -163,7 +162,6 @@ class IgdbService {
     }
 
     async gameMatch(gameName, gameId) {
-        console.log(gameName, gameId);
         const res =  await req
             .post('https://api.igdb.com/v4/games/')
             .set('Authorization', `Bearer ${this.credentials.authorization}`)

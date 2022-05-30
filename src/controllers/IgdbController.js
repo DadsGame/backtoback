@@ -13,7 +13,6 @@ export const searchGames = async (request, h) => {
        const msg = {error: 'search query param not present or not content has been provided'};
        return h.response(msg).code(400);
     }
-    console.log(gameName);
     const cache = await redisClient.get(`igdb/search:${gameName}`);
     if(cache) {
         return JSON.parse(cache);
