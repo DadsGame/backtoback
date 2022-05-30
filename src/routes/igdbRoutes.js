@@ -1,4 +1,11 @@
-import {searchGames, platforms, topTenGames} from "../controllers/IgdbController.js";
+import {
+    searchGames,
+    platforms,
+    topTenGames,
+    comingSoonGames,
+    getGameById,
+    gameMatch
+} from "../controllers/IgdbController.js";
 
 const routes = [
     {
@@ -16,6 +23,21 @@ const routes = [
         path: 'topten',
         handler: topTenGames,
     },
-].map((route) => ({...route, path: `/api/igdb/${route.path}`}));;
+    {
+        method: 'GET',
+        path: 'coming_soon',
+        handler: comingSoonGames,
+    },
+    {
+        method: 'GET',
+        path: 'games/byId',
+        handler: getGameById,
+    },
+    {
+        method: 'GET',
+        path: 'games/shouldBeLocal',
+        handler: gameMatch,
+    }
+].map((route) => ({...route, path: `/api/igdb/${route.path}`}));
 
 export default routes;

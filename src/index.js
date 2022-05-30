@@ -11,7 +11,16 @@ const HOST = process.env.HOST || 'localhost';
 
 const server = Hapi.server({
     port: PORT,
-    host: HOST
+    host: HOST,
+    routes: {
+        cors: {
+            origin: ['*'], // an array of origins or 'ignore'
+            headers: ['Authorization'], // an array of strings - 'Access-Control-Allow-Headers'
+            exposedHeaders: ['Accept'], // an array of exposed headers - 'Access-Control-Expose-Headers',
+            additionalExposedHeaders: ['Accept'], // an array of additional exposed headers
+            maxAge: 60,
+        }
+    }
 });
 
 

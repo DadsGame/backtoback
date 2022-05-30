@@ -1,5 +1,6 @@
 import req from "superagent";
 import {conf} from "../../conf.js";
+import {gameMatch} from "../controllers/IgdbController.js";
 const ONE_HOUR = 60 * 60;
 
 
@@ -42,7 +43,7 @@ class IgdbService {
     async searchGames(gameName) {
         // TODO: We might want to filter fields later on (should be a global var)
         // const res = await req.post('https://api.igdb.com/v4/games/').body(`fields *; search ${gameName}`);
-        console.log('hello')
+        const formattedGames = [];
         const res =  await req
             .post('https://api.igdb.com/v4/games/')
             .set('Authorization', `Bearer ${this.credentials.authorization}`)
@@ -51,7 +52,11 @@ class IgdbService {
             .send(`fields *; search "${gameName}";`)
             .catch((err) => console.error(err));
 
-        return res.body;
+        for (const game of res.body) {
+            const cover = await this._retrieveAndUpdateCover(game.id);
+            formattedGames.push({...game, cover: cover[0]?.url});
+        }
+        return formattedGames;
     }
 
     /**
@@ -76,6 +81,26 @@ class IgdbService {
             formattedGames.push({...game, cover: cover[0].url});
         }
         // return res.body.map( (game) => ({...game, cover:  this._retriveAndUpdateCover(game.id)}));
+        return formattedGames;
+    }
+
+    async comingSoonGames(platforms = [], timeWindow = 1, limit = 20) {
+        const now = Date.now();
+        const date = new Date(now);
+        const ts = new Date(date.setMonth(date.getMonth() + timeWindow)).getTime();
+        console.log(new Date(now), new Date(ts));
+        const res = await req
+            .post('https://api.igdb.com/v4/games/')
+            .set('Authorization', `Bearer ${this.credentials.authorization}`)
+            .set('Client-ID', this.credentials.client_id)
+            .type('text/plain')
+            .send(`fields *; where first_release_date > ${parseInt(now/1000)} & first_release_date < ${parseInt(ts/1000)}; limit ${limit}; sort first_release_date asc;`)
+            .catch((err) => console.error(err));
+        const formattedGames = [];
+        for (const game of res.body) {
+            const cover = await this._retrieveAndUpdateCover(game.id);
+            formattedGames.push({...game, cover: cover[0].url});
+        }
         return formattedGames;
     }
 
@@ -126,6 +151,28 @@ class IgdbService {
         return res.body;
     }
 
+    async getGameById(gameId) {
+        const res =  await req
+            .post('https://api.igdb.com/v4/games/')
+            .set('Authorization', `Bearer ${this.credentials.authorization}`)
+            .set('Client-ID', this.credentials.client_id)
+            .type('text/plain')
+            .send(`fields *; where id = ${gameId};`)
+            .catch((err) => console.error(err));
+        return res.body;
+    }
+
+    async gameMatch(gameName, gameId) {
+        console.log(gameName, gameId);
+        const res =  await req
+            .post('https://api.igdb.com/v4/games/')
+            .set('Authorization', `Bearer ${this.credentials.authorization}`)
+            .set('Client-ID', this.credentials.client_id)
+            .type('text/plain')
+            .send(`fields name, id; where id = '${gameId}' & name = "${gameName}";`)
+            .catch((err) => console.error(err));
+        return {shouldBeLocal: res.body.length === 0};
+    }
 }
 
 export default IgdbService;
