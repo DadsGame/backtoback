@@ -158,7 +158,13 @@ class IgdbService {
             .type('text/plain')
             .send(`fields *; where id = ${gameId};`)
             .catch((err) => console.error(err));
-        return res.body;
+
+        const formattedGames = [];
+        for (const game of res.body) {
+            const cover = await this._retrieveAndUpdateCover(game.id);
+            formattedGames.push({...game, cover: cover[0].url});
+        }
+        return formattedGames;
     }
 
     async gameMatch(gameName, gameId) {
