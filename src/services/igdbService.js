@@ -2,6 +2,11 @@ import req from "superagent";
 import {conf} from "../../conf.js";
 import {gameMatch} from "../controllers/IgdbController.js";
 const ONE_HOUR = 60 * 60;
+const ONE_DAY = ONE_HOUR * 24;
+const ONE_WEEK = ONE_DAY * 7;
+const ONE_MONTH = ONE_WEEK * 4;
+const ONE_YEAR = ONE_MONTH * 12;
+
 
 
 
@@ -130,6 +135,7 @@ class IgdbService {
         return formattedCover;
 
     }
+
     async _retrieveAndUpdatePlatforms() {
         // TODO: put this in a lib function I guess (redis cache)
         const redisClient = conf.redisClient();
@@ -146,7 +152,26 @@ class IgdbService {
             .send(`fields id, name; limit 500;`)
             .catch((err) => console.error(err));
         await redisClient.set('igdb/platforms', JSON.stringify(res.body));
-        await redisClient.expire('igdb/platforms', ONE_HOUR);
+        await redisClient.expire('igdb/platforms', ONE_YEAR);
+        return res.body;
+    }
+
+    async _retrieveAndUpdateGenres() {
+        const redisClient = conf.redisClient();
+        await redisClient.connect();
+        const cache = await redisClient.get('igdb/genres');
+        if(cache) {
+            return JSON.parse(cache);
+        }
+        const res = await req
+            .post('https://api.igdb.com/v4/genres/')
+            .set('Authorization', `Bearer ${this.credentials.authorization}`)
+            .set('Client-ID', this.credentials.client_id)
+            .type('text/plain')
+            .send(`fields id, name; limit 500;`)
+            .catch((err) => console.error(err));
+        await redisClient.set('igdb/genres', JSON.stringify(res.body));
+        await redisClient.expire('igdb/genres', ONE_YEAR);
         return res.body;
     }
 
@@ -160,9 +185,23 @@ class IgdbService {
             .catch((err) => console.error(err));
 
         const formattedGames = [];
+        const [platforms, genres] = await Promise.all([
+            await this._retrieveAndUpdatePlatforms(),
+            await this._retrieveAndUpdateGenres(),
+        ]);
         for (const game of res.body) {
             const cover = await this._retrieveAndUpdateCover(game.id);
-            formattedGames.push({...game, cover: cover[0].url});
+            const formattedPlatforms = [];
+            const formattedGenres = [];
+            game.platforms.forEach((platform) => {
+                const foundPlatform = platforms.find((p) => p.id === platform);
+                formattedPlatforms.push(foundPlatform);
+            });
+            game.genres.forEach((genre) => {
+                const foundGenre = genres.find((g) => g.id === genre);
+                formattedGenres.push(foundGenre);
+            });
+            formattedGames.push({...game, cover: cover[0].url, platforms: formattedPlatforms, genres: formattedGenres});
         }
         return formattedGames;
     }
