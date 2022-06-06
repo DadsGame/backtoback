@@ -31,3 +31,5 @@ npm run dev
 # or
 yarn dev
 ```
+
+API running on [http://localhost:8000](http://localhost:8000).
