@@ -20,7 +20,8 @@ const server = Hapi.server({
             additionalExposedHeaders: ['Accept'], // an array of additional exposed headers
             maxAge: 60,
         }
-    }
+    },
+    debug: { request: ['error'] }
 });
 
 
