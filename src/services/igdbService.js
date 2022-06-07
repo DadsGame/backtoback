@@ -8,7 +8,7 @@ const ONE_MONTH = ONE_WEEK * 4;
 const ONE_YEAR = ONE_MONTH * 12;
 
 
-const redisClient = conf.redisClient();
+const redisClient = await conf.redisClient();
 
 function getErrorMessage (error) {
     if (error.code === 'EAI_AGAIN') {

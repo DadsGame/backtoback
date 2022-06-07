@@ -5,9 +5,9 @@ const igdbService = new IgdbService();
 const ONE_HOUR = 60 * 60;
 const ONE_DAY = ONE_HOUR * 24;
 
+const redisClient = await conf.redisClient();
+
 export const searchGames = async (request, h) => {
-    const redisClient = conf.redisClient();
-    await redisClient.connect();
     const gameName = request.query?.name?.toLowerCase();
     if (gameName == null) {
        const msg = {error: 'search query param not present or not content has been provided'};
@@ -24,8 +24,6 @@ export const searchGames = async (request, h) => {
 };
 
 export const topTenGames = async (request, h) => {
-    const redisClient = conf.redisClient();
-    await redisClient.connect();
     const cache = await redisClient.get(`igdb/top_ten`);
     if(cache) {
         return JSON.parse(cache);
@@ -37,8 +35,6 @@ export const topTenGames = async (request, h) => {
 }
 
 export const comingSoonGames = async (request, h) => {
-    const redisClient = conf.redisClient();
-    await redisClient.connect();
     const cache = await redisClient.get(`igdb/coming_soon`);
     if(cache) {
         return JSON.parse(cache);
@@ -50,8 +46,6 @@ export const comingSoonGames = async (request, h) => {
 }
 
 export const getGameById = async (request, h) => {
-    const redisClient = conf.redisClient();
-    await redisClient.connect();
     const gameId = request.query?.id?.toLowerCase();
     if (gameId == null) {
         const msg = {error: 'search query param not present or no content has been provided'};
@@ -68,8 +62,6 @@ export const getGameById = async (request, h) => {
 }
 
 export const gameMatch = async (request, h) => {
-    const redisClient = conf.redisClient();
-    await redisClient.connect();
     const gameId = request.query?.id?.toLowerCase();
     const gameName = request.query?.name;
     if (gameId == null || gameName == null || gameId === '' || gameName === '') {
