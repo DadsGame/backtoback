@@ -10,10 +10,11 @@ const REDIS_URL = process.env.REDIS_URL ?? `redis://${REDIS_HOST}:${REDIS_PORT}`
 config();
 
 export const conf = {
-    redisClient : () => {
+    redisClient : async () => {
         const client = createClient({
             url: REDIS_URL,
         });
+        await client.connect();
         return client;
     },
     IGDB_AUTHORIZATION: {authorization: process.env.TWITCH_TOKEN, client_id: process.env.TWITCH_CLIENT_ID},

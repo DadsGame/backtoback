@@ -8,7 +8,7 @@ const ONE_MONTH = ONE_WEEK * 4;
 const ONE_YEAR = ONE_MONTH * 12;
 
 
-
+const redisClient = conf.redisClient();
 
 function getErrorMessage (error) {
     if (error.code === 'EAI_AGAIN') {
@@ -110,8 +110,6 @@ class IgdbService {
 
     async _retrieveAndUpdateCover(gameid) {
         // TODO: put this in a lib function I guess (redis cache)
-        const redisClient = conf.redisClient();
-        await redisClient.connect();
         const cache = await redisClient.get(`igdb/cover:${gameid}`);
         if(cache) {
             return JSON.parse(cache);
@@ -132,15 +130,11 @@ class IgdbService {
             ));
         await redisClient.set(`igdb/cover:${gameid}`, JSON.stringify(formattedCover));
         await redisClient.expire(`igdb/cover:${gameid}`, ONE_HOUR);
-        await redisClient.disconnect();
         return formattedCover;
 
     }
 
     async _retrieveAndUpdatePlatforms() {
-        // TODO: put this in a lib function I guess (redis cache)
-        const redisClient = conf.redisClient();
-        await redisClient.connect();
         const cache = await redisClient.get('igdb/platforms');
         if(cache) {
             return JSON.parse(cache);
@@ -154,13 +148,10 @@ class IgdbService {
             .catch((err) => console.error(err));
         await redisClient.set('igdb/platforms', JSON.stringify(res.body));
         await redisClient.expire('igdb/platforms', ONE_YEAR);
-        await redisClient.disconnect();
         return res.body;
     }
 
     async _retrieveAndUpdateGenres() {
-        const redisClient = conf.redisClient();
-        await redisClient.connect();
         const cache = await redisClient.get('igdb/genres');
         if(cache) {
             return JSON.parse(cache);
@@ -174,7 +165,6 @@ class IgdbService {
             .catch((err) => console.error(err));
         await redisClient.set('igdb/genres', JSON.stringify(res.body));
         await redisClient.expire('igdb/genres', ONE_YEAR);
-        await redisClient.disconnect();
         return res.body;
     }
 
