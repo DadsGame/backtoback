@@ -132,6 +132,7 @@ class IgdbService {
             ));
         await redisClient.set(`igdb/cover:${gameid}`, JSON.stringify(formattedCover));
         await redisClient.expire(`igdb/cover:${gameid}`, ONE_HOUR);
+        await redisClient.disconnect();
         return formattedCover;
 
     }
@@ -153,6 +154,7 @@ class IgdbService {
             .catch((err) => console.error(err));
         await redisClient.set('igdb/platforms', JSON.stringify(res.body));
         await redisClient.expire('igdb/platforms', ONE_YEAR);
+        await redisClient.disconnect();
         return res.body;
     }
 
@@ -172,6 +174,7 @@ class IgdbService {
             .catch((err) => console.error(err));
         await redisClient.set('igdb/genres', JSON.stringify(res.body));
         await redisClient.expire('igdb/genres', ONE_YEAR);
+        await redisClient.disconnect();
         return res.body;
     }
 
