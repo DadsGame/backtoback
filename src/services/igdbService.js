@@ -186,15 +186,18 @@ class IgdbService {
             const cover = await this._retrieveAndUpdateCover(game.id);
             const formattedPlatforms = [];
             const formattedGenres = [];
-            game.platforms.forEach((platform) => {
+            game?.platforms?.forEach((platform) => {
                 const foundPlatform = platforms.find((p) => p.id === platform);
                 formattedPlatforms.push(foundPlatform);
             });
-            game.genres.forEach((genre) => {
+            game?.genres?.forEach((genre) => {
                 const foundGenre = genres.find((g) => g.id === genre);
                 formattedGenres.push(foundGenre);
             });
-            formattedGames.push({...game, cover: cover[0].url, platforms: formattedPlatforms, genres: formattedGenres});
+            formattedGames.push({...game,
+                cover: cover[0].url,
+                platforms: (formattedPlatforms.length !== 0) ? formattedPlatforms : game.platforms,
+                genres: (formattedGenres.length !== 0) ? formattedGenres : game.genres});
         }
         return formattedGames;
     }
